@@ -6,17 +6,26 @@ from admin_dashboard import admin_dashboard
 from user_management import user_management
 from resource_management import resource_management
 
-st.set_page_config(page_title="Device Manager", layout="wide")
+# Set page title and layout
+st.set_page_config(page_title="Device Management System", layout="wide")
 
-# Initialize session
+# Initialize session state
 if "username" not in st.session_state:
-    st.session_state.username = None
-    st.session_state.role = None
+    st.session_state["username"] = None
+    st.session_state["role"] = None
 
-menu = st.sidebar.selectbox("Menu", ["Home", "Signup", "Login"])
+# If user is logged in
+if st.session_state["username"]:
+    st.sidebar.markdown(f"👋 Logged in as: {st.session_state.username}")
 
-if st.session_state.username:
-    if st.session_state.role == "admin":
+    # Logout Button
+    if st.sidebar.button("Logout"):
+        st.session_state.clear()
+        st.success("You have been logged out.")
+        st.experimental_rerun()
+
+    # Admin Role
+    if st.session_state["role"] == "admin":
         menu = st.sidebar.selectbox("Admin Menu", ["Dashboard", "User Management", "Resource Management"])
         if menu == "Dashboard":
             admin_dashboard()
@@ -24,13 +33,18 @@ if st.session_state.username:
             user_management()
         elif menu == "Resource Management":
             resource_management()
-    elif st.session_state.role == "user":
+
+    # Normal User Role
+    elif st.session_state["role"] == "user":
         menu = st.sidebar.selectbox("User Menu", ["User Management", "Resource Management"])
         if menu == "User Management":
             user_management()
         elif menu == "Resource Management":
             resource_management()
+
+# If user is not logged in
 else:
+    menu = st.sidebar.selectbox("Menu", ["Home", "Signup", "Login"])
     if menu == "Home":
         home()
     elif menu == "Signup":
